@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Submission Form</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .form-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom right, #fddcc8, #ace1d8);
+    }
+    .form-card {
+      display: flex;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 100%;
+    }
+    .form-section {
+      flex: 1;
+      padding: 40px;
+      border-radius: 20px 0 0 20px;
+    }
+    .form-section h3 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      width: 30%;
+      font-weight: bold;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .form-control {
+      width: 70%;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .submit-btn {
+      background-color: #00bfa5;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .submit-btn:hover {
+      background-color: #00a890;
+    }
+    .info-section {
+      background-color: #4db6ac;
+      border-radius: 0 20px 20px 0;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .info-section img {
+      max-width: 100%;
+      border-radius: 0 20px 20px 0;
+    }
+    /* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .form-container {
+    width: 100vw;  /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    padding: 0;
+    margin: 0;
+  }
+  
+  .form-card {
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    border-radius: 0;
+  }
+
+  .form-section {
+    padding: 20px;
+    height: 100%;
+  }
+
+  .info-section {
+    display: none; /* Hide the image on small devices */
+  }
+
+  .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-group label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .form-group .form-control {
+    width: 100%;
+  }
+
+  .submit-btn {
+    font-size: 18px;
+    padding: 14px;
+  }
+  }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <div class="form-card">
+      <!-- Form Section -->
+      <div class="form-section">
+        <h3 style="text-align: center; align-items: center;">Submit Your Project</h3>
+
+        <form id="projectForm">
+          <!-- Project File Upload -->
+          <div class="form-group">
+            <label for="files">Requirements</label>
+            <input type="file" class="form-control" id="files" name="files" multiple>
+          </div>
+
+          <!-- Payment (KES and EUR) -->
+          <div class="form-group">
+            <label for="paymentKES">Payment </label>
+            <input type="number" step="0.01" class="form-control" id="paymentKES" name="paymentKES" placeholder="KES" required>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentEUR">Equivalent</label>
+            <input type="number" step="0.01" class="form-control" id="paymentEUR" name="paymentEUR" placeholder="EUR" readonly>
+          </div>
+
+          <!-- Deadline -->
+          <div class="form-group">
+            <label for="deadline">Deadline</label>
+            <input type="date" class="form-control" id="deadline" name="deadline" required>
+          </div>
+
+          <!-- Deliverables -->
+          <div class="form-group">
+            <label for="deliverables">Deliverables</label>
+            <textarea id="deliverables" class="form-control" name="deliverables" rows="3" placeholder="Describe the project deliverables..." required></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="button" class="submit-btn" onclick="submitForm()">Submit</button>
+        </form>
+      </div>
+
+      <!-- Info Section with Image -->
+      <div class="info-section">
+        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80" alt="Support or Illustration Image">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Function to fetch the latest KES to EUR exchange rate from an API
+    async function fetchConversionRate() {
+      const API_KEY = 'e9fffac5c638b10b7e1d9bd6';  // Your API key
+      const API_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/KES`;
+
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        return data.conversion_rates.EUR;
+      } catch (error) {
+        console.error('Error fetching conversion rate:', error);
+        return 0.007;  // Fallback exchange rate
+      }
+    }
+
+    // Update EUR equivalent based on KES input
+    document.getElementById('paymentKES').addEventListener('input', async function () {
+      const kesValue = parseFloat(this.value);
+      if (!isNaN(kesValue)) {
+        const conversionRate = await fetchConversionRate();
+        document.getElementById('paymentEUR').value = (kesValue * conversionRate).toFixed(2);
+      } else {
+        document.getElementById('paymentEUR').value = '';
+      }
+    });
+
+    // Submit Form (using fetch to send data to your server)
+    async function submitForm() {
+      const form = document.getElementById('projectForm');
+      const formData = new FormData(form);
+
+      // Send form data (files and inputs) to the server
+      try {
+        const response = await fetch('https://your-server-endpoint.com/upload', {  // Replace with your actual backend URL
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('Form submitted successfully!');
+        } else {
+          alert('Error submitting the form.');
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('There was an error submitting your form. Please try again later.');
+      }
+    }
+  </script>
+
+</body>
+</html>
